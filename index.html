@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Electricity Bill Submission</title>
     <style>
-        /* Modern CSS Reset and Base Styles */
+        /* Base Styles */
         :root {
             --primary-color: #2563eb;
             --primary-hover: #1d4ed8;
@@ -23,178 +23,76 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
             background-color: var(--bg-color); 
             color: var(--text-main);
-            margin: 0;
-            padding: 20px; 
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
+            margin: 0; padding: 20px; display: flex; justify-content: center; min-height: 100vh;
         }
 
         .container { 
-            width: 100%;
-            max-width: 650px; 
-            background: white; 
-            padding: 40px; 
-            border-radius: 12px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
-            box-sizing: border-box;
+            width: 100%; max-width: 650px; background: white; padding: 40px; 
+            border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); box-sizing: border-box;
         }
 
-        h2 { 
-            text-align: center; 
-            color: var(--text-main); 
-            margin-top: 0;
-            margin-bottom: 8px;
-            font-size: 24px;
-            font-weight: 700;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: var(--text-muted);
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-
+        h2 { text-align: center; color: var(--text-main); margin-top: 0; margin-bottom: 8px; font-size: 24px; font-weight: 700; }
+        .subtitle { text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: 14px; }
         .form-group { margin-bottom: 20px; }
-
-        label { 
-            display: block; 
-            font-weight: 600; 
-            margin-bottom: 8px; 
-            font-size: 14px;
-            color: var(--text-main);
-        }
+        label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; color: var(--text-main); }
 
         input[type="text"], input[type="date"], input[type="file"] { 
-            width: 100%; 
-            padding: 12px 15px; 
-            border: 1px solid var(--border-color); 
-            border-radius: 8px; 
-            box-sizing: border-box; 
-            font-size: 15px;
-            font-family: inherit;
-            transition: all 0.2s ease;
-            background-color: #fff;
+            width: 100%; padding: 12px 15px; border: 1px solid var(--border-color); 
+            border-radius: 8px; box-sizing: border-box; font-size: 15px; font-family: inherit; transition: all 0.2s ease;
         }
-
         input[type="text"]:focus, input[type="date"]:focus, input[type="file"]:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+            outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
         }
 
         input[type="file"] { padding: 10px; color: var(--text-muted); }
         input[type="file"]::file-selector-button {
-            padding: 8px 16px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            background-color: var(--secondary-color);
-            color: var(--text-main);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-right: 15px;
+            padding: 8px 16px; border-radius: 6px; border: 1px solid var(--border-color);
+            background-color: var(--secondary-color); color: var(--text-main); font-weight: 600;
+            cursor: pointer; transition: all 0.2s; margin-right: 15px;
         }
         input[type="file"]::file-selector-button:hover { background-color: var(--secondary-hover); }
 
-        .bill-section { 
-            background: #ffffff; 
-            padding: 20px; 
-            border: 1px solid var(--border-color); 
-            margin-bottom: 20px; 
-            border-radius: 8px; 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-        }
+        .bill-section { background: #ffffff; padding: 20px; border: 1px solid var(--border-color); margin-bottom: 20px; border-radius: 8px; }
+        .bill-section-title { font-size: 16px; font-weight: 700; color: var(--primary-color); margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--secondary-hover); }
 
-        .bill-section-title {
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--secondary-hover);
-        }
-
-        .btn { 
-            padding: 14px 20px; 
-            border: none; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-size: 16px; 
-            font-weight: 600;
-            width: 100%; 
-            transition: all 0.2s ease;
-            box-sizing: border-box;
-            font-family: inherit;
-        }
-
-        .btn-add { 
-            background-color: var(--secondary-color); 
-            color: var(--text-main); 
-            border: 1px dashed #94a3b8;
-            margin-bottom: 20px;
-        }
+        .btn { padding: 14px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600; width: 100%; transition: all 0.2s ease; font-family: inherit; margin-bottom: 15px;}
+        .btn-add { background-color: var(--secondary-color); color: var(--text-main); border: 1px dashed #94a3b8; }
         .btn-add:hover { background-color: var(--secondary-hover); border-style: solid; }
-
         .btn-submit { background-color: var(--primary-color); color: white; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2); }
         .btn-submit:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
         .btn:disabled { background-color: #94a3b8; cursor: not-allowed; transform: none !important; }
 
         .error { color: var(--error-color); font-size: 13px; margin-top: 6px; font-weight: 500; }
 
-        /* Progress Bar Styles */
-        #progressContainer {
-            display: none;
-            margin-top: 25px;
-            padding: 20px;
-            background-color: var(--secondary-color);
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
+        /* --- NEW MODAL STYLES --- */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px);
+            z-index: 9999; justify-content: center; align-items: center;
         }
+        .modal-content {
+            background: white; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); text-align: center;
+        }
+        #progressStatusText { font-weight: 600; font-size: 18px; margin-bottom: 15px; color: var(--text-main); }
         
-        #progressStatusText {
-            text-align: center;
-            font-weight: 600;
-            margin-bottom: 10px;
-            color: var(--primary-color);
+        .progress-bar-bg { width: 100%; height: 14px; background-color: #e2e8f0; border-radius: 20px; overflow: hidden; margin-bottom: 12px; }
+        .progress-bar-fill { height: 100%; width: 0%; background-color: var(--primary-color); border-radius: 20px; transition: width 0.4s ease; }
+        
+        .progress-stats { display: flex; justify-content: space-between; font-size: 14px; color: var(--text-muted); font-weight: 500; }
+        .modal-close-btn { 
+            display: none; margin-top: 20px; padding: 10px 20px; background: var(--secondary-color); 
+            border: none; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%;
         }
+        .modal-close-btn:hover { background: var(--secondary-hover); }
 
-        .progress-bar-bg {
-            width: 100%;
-            height: 12px;
-            background-color: #cbd5e1;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            width: 0%;
-            background-color: var(--primary-color);
-            border-radius: 10px;
-            transition: width 0.5s ease;
-        }
-
-        .progress-stats {
-            display: flex;
-            justify-content: space-between;
-            font-size: 13px;
-            color: var(--text-muted);
-            font-weight: 500;
-        }
-
-        @media (max-width: 600px) {
-            .container { padding: 25px 20px; }
-            body { padding: 10px; }
-        }
+        @media (max-width: 600px) { .container { padding: 25px 20px; } body { padding: 10px; } }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>OKElectricity Bill Collection</h2>
+    <h2>Electricity Bill Collection</h2>
     <div class="subtitle">Please submit 2 to 5 recent electricity bills</div>
     
     <form id="uploadForm">
@@ -216,18 +114,21 @@
 
         <button type="button" id="addBillBtn" class="btn btn-add" onclick="addBillSection()">+ Add Another Electricity Bill</button>
         <button type="submit" id="submitBtn" class="btn btn-submit">Submit Documents</button>
-        
-        <div id="progressContainer">
-            <div id="progressStatusText">Preparing files...</div>
-            <div class="progress-bar-bg">
-                <div id="progressBarFill" class="progress-bar-fill"></div>
-            </div>
-            <div class="progress-stats">
-                <span id="progressPercent">0%</span>
-                <span id="progressTime">Calculating...</span>
-            </div>
-        </div>
     </form>
+</div>
+
+<div id="uploadModal" class="modal-overlay">
+    <div class="modal-content">
+        <div id="progressStatusText">Preparing files...</div>
+        <div class="progress-bar-bg">
+            <div id="progressBarFill" class="progress-bar-fill"></div>
+        </div>
+        <div class="progress-stats">
+            <span id="progressPercent">0%</span>
+            <span id="progressTime">Calculating...</span>
+        </div>
+        <button id="modalCloseBtn" class="modal-close-btn" onclick="closeModal()">Close</button>
+    </div>
 </div>
 
 <script>
@@ -235,18 +136,14 @@
     const maxBills = 5;
     const maxFileSize = 5 * 1024 * 1024; // 5 MB
 
-    // Your active deployment URL
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbw6EIUp7XOaCoHQoX3r3IvcseUL6eUVn9D0_jmR5ooXGbTT0BvrBVD_OJvbaOFwb1mtfg/exec'; 
+    // PASTE YOUR NEW VERSION 2 WEB APP URL HERE
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwx3S-SgSQElOLpEiNNtiCABbMHFpg9vWAkEulYw7hvolBkyceR9CGXeNve-0Ahi9KTIw/exec'; 
 
-    window.onload = () => {
-        addBillSection();
-        addBillSection();
-    };
+    window.onload = () => { addBillSection(); addBillSection(); };
 
     function addBillSection() {
         if (billCount >= maxBills) return;
         billCount++;
-
         const container = document.getElementById('billsContainer');
         const section = document.createElement('div');
         section.className = 'bill-section';
@@ -263,10 +160,7 @@
             </div>
         `;
         container.appendChild(section);
-
-        if (billCount === maxBills) {
-            document.getElementById('addBillBtn').style.display = 'none';
-        }
+        if (billCount === maxBills) document.getElementById('addBillBtn').style.display = 'none';
     }
 
     function checkFileSize(input) {
@@ -285,13 +179,18 @@
         reader.readAsDataURL(file);
         reader.onload = () => {
             let encoded = reader.result.toString().replace(/^data:(.*,)?/, '');
-            if ((encoded.length % 4) > 0) {
-                encoded += '='.repeat(4 - (encoded.length % 4));
-            }
+            if ((encoded.length % 4) > 0) encoded += '='.repeat(4 - (encoded.length % 4));
             resolve(encoded);
         };
         reader.onerror = error => reject(error);
     });
+
+    function closeModal() {
+        document.getElementById('uploadModal').style.display = 'none';
+        document.getElementById('modalCloseBtn').style.display = 'none';
+        document.getElementById('submitBtn').disabled = false;
+        document.getElementById('addBillBtn').disabled = false;
+    }
 
     document.getElementById('uploadForm').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -304,17 +203,16 @@
             return;
         }
 
-        // Lock form during upload
+        // Lock form and show Modal
         document.getElementById('submitBtn').disabled = true;
         document.getElementById('addBillBtn').disabled = true;
-        document.getElementById('submitBtn').innerText = 'Uploading...';
         
-        // Reset and show progress UI
-        document.getElementById('progressContainer').style.display = 'block';
+        document.getElementById('uploadModal').style.display = 'flex';
         document.getElementById('progressBarFill').style.width = '0%';
         document.getElementById('progressPercent').innerText = '0%';
-        document.getElementById('progressStatusText').innerText = 'Uploading to Drive...';
+        document.getElementById('progressStatusText').innerText = 'Uploading data securely...';
         document.getElementById('progressBarFill').style.backgroundColor = 'var(--primary-color)';
+        document.getElementById('modalCloseBtn').style.display = 'none';
 
         try {
             let processedBills = [];
@@ -322,15 +220,9 @@
 
             for (let i = 0; i < filesInputs.length; i++) {
                 const fileObj = filesInputs[i].files[0];
-                totalBytes += fileObj.size; // Calculate total size
+                totalBytes += fileObj.size; 
                 const base64Data = await getBase64(fileObj);
-                
-                processedBills.push({
-                    date: dates[i].value,
-                    filename: fileObj.name,
-                    mimeType: fileObj.type,
-                    base64: base64Data
-                });
+                processedBills.push({ date: dates[i].value, filename: fileObj.name, mimeType: fileObj.type, base64: base64Data });
             }
 
             const payload = {
@@ -340,70 +232,70 @@
                 bills: processedBills
             };
 
-            // Calculate estimated time based on file size (assuming ~300KB/s on a decent connection)
-            let estimatedSeconds = Math.max((totalBytes / 300000), 4); 
+            let estimatedSeconds = Math.max((totalBytes / 300000), 5); 
             let currentProgress = 0;
             
-            // Start Simulated Progress Bar
+            // Progress Bar Animation
             const progressInterval = setInterval(() => {
-                // Advance the bar gradually based on estimated time
                 currentProgress += (100 / estimatedSeconds) * 0.5; 
-                
                 if (currentProgress > 95) {
-                    currentProgress = 95; // Hold at 95% until server responds
-                    document.getElementById('progressStatusText').innerText = 'Processing files on server...';
+                    currentProgress = 95; // Hold at 95%
+                    document.getElementById('progressStatusText').innerText = 'Saving to Google Drive...';
                 }
-                
                 document.getElementById('progressBarFill').style.width = currentProgress + '%';
                 document.getElementById('progressPercent').innerText = Math.round(currentProgress) + '%';
-                
                 let timeRemaining = Math.max(Math.round(estimatedSeconds - (currentProgress/100 * estimatedSeconds)), 1);
-                document.getElementById('progressTime').innerText = `Estimated ~${timeRemaining}s remaining`;
+                document.getElementById('progressTime').innerText = `~${timeRemaining}s remaining`;
+            }, 500); 
 
-            }, 500); // update every half second
-
-            // Send using fetch (safe from CORS preflight issues)
+            // Network Request
             const response = await fetch(scriptURL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                // Explicitly omitted Content-Type header to bypass strict CORS preflight checks
                 body: JSON.stringify(payload)
             });
 
-            const result = await response.json();
-            
-            // Clear the simulated progress and push to 100%
+            const textResponse = await response.text();
             clearInterval(progressInterval);
 
-            if (result.status === "success") {
-                document.getElementById('progressBarFill').style.width = '100%';
-                document.getElementById('progressPercent').innerText = '100%';
-                document.getElementById('progressTime').innerText = 'Done!';
-                document.getElementById('progressStatusText').innerText = 'Success!';
-                document.getElementById('progressBarFill').style.backgroundColor = 'var(--success-color)';
+            try {
+                const result = JSON.parse(textResponse);
                 
-                setTimeout(() => {
-                    alert("Documents submitted successfully!");
-                    document.getElementById('uploadForm').reset();
-                    window.location.reload(); 
-                }, 600);
-            } else {
-                alert("Error from server: " + result.message);
-                resetFormUI();
+                if (result.status === "error") {
+                    // This catches the Duplicate Roll No error!
+                    document.getElementById('progressBarFill').style.backgroundColor = 'var(--error-color)';
+                    document.getElementById('progressStatusText').innerText = 'Submission Failed';
+                    document.getElementById('progressTime').innerText = result.message;
+                    document.getElementById('modalCloseBtn').style.display = 'block';
+                } else if (result.status === "success") {
+                    document.getElementById('progressBarFill').style.width = '100%';
+                    document.getElementById('progressPercent').innerText = '100%';
+                    document.getElementById('progressTime').innerText = 'Complete!';
+                    document.getElementById('progressStatusText').innerText = 'Success!';
+                    document.getElementById('progressBarFill').style.backgroundColor = 'var(--success-color)';
+                    
+                    setTimeout(() => {
+                        alert("Documents submitted successfully!");
+                        document.getElementById('uploadForm').reset();
+                        window.location.reload(); 
+                    }, 800);
+                }
+            } catch (jsonError) {
+                // If Google blocks the JSON response but the files uploaded anyway
+                document.getElementById('progressBarFill').style.backgroundColor = '#f59e0b'; // warning color
+                document.getElementById('progressStatusText').innerText = 'Upload Sent!';
+                document.getElementById('progressTime').innerText = 'Please check with Admin to confirm receipt.';
+                document.getElementById('modalCloseBtn').style.display = 'block';
             }
 
         } catch (error) {
             console.error(error);
-            alert("An error occurred during upload. Please check your connection and try again.");
-            resetFormUI();
+            document.getElementById('progressBarFill').style.backgroundColor = 'var(--error-color)';
+            document.getElementById('progressStatusText').innerText = 'Network Disconnected';
+            document.getElementById('progressTime').innerText = 'Check your internet and try again.';
+            document.getElementById('modalCloseBtn').style.display = 'block';
         }
     });
-
-    function resetFormUI() {
-        document.getElementById('submitBtn').disabled = false;
-        document.getElementById('addBillBtn').disabled = false;
-        document.getElementById('submitBtn').innerText = 'Submit Documents';
-        document.getElementById('progressContainer').style.display = 'none';
-    }
 </script>
 
 </body>
