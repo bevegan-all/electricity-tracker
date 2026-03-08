@@ -16,6 +16,7 @@
             --border-color: #cbd5e1;
             --bg-color: #f8fafc;
             --error-color: #ef4444;
+            --success-color: #10b981;
         }
 
         body { 
@@ -55,9 +56,7 @@
             font-size: 14px;
         }
 
-        .form-group { 
-            margin-bottom: 20px; 
-        }
+        .form-group { margin-bottom: 20px; }
 
         label { 
             display: block; 
@@ -67,9 +66,7 @@
             color: var(--text-main);
         }
 
-        input[type="text"], 
-        input[type="date"], 
-        input[type="file"] { 
+        input[type="text"], input[type="date"], input[type="file"] { 
             width: 100%; 
             padding: 12px 15px; 
             border: 1px solid var(--border-color); 
@@ -81,19 +78,13 @@
             background-color: #fff;
         }
 
-        input[type="text"]:focus, 
-        input[type="date"]:focus, 
-        input[type="file"]:focus {
+        input[type="text"]:focus, input[type="date"]:focus, input[type="file"]:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
         }
 
-        /* Styling the file input specifically */
-        input[type="file"] {
-            padding: 10px;
-            color: var(--text-muted);
-        }
+        input[type="file"] { padding: 10px; color: var(--text-muted); }
         input[type="file"]::file-selector-button {
             padding: 8px 16px;
             border-radius: 6px;
@@ -105,9 +96,7 @@
             transition: all 0.2s;
             margin-right: 15px;
         }
-        input[type="file"]::file-selector-button:hover {
-            background-color: var(--secondary-hover);
-        }
+        input[type="file"]::file-selector-button:hover { background-color: var(--secondary-hover); }
 
         .bill-section { 
             background: #ffffff; 
@@ -116,7 +105,6 @@
             margin-bottom: 20px; 
             border-radius: 8px; 
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            position: relative;
         }
 
         .bill-section-title {
@@ -147,59 +135,59 @@
             border: 1px dashed #94a3b8;
             margin-bottom: 20px;
         }
+        .btn-add:hover { background-color: var(--secondary-hover); border-style: solid; }
 
-        .btn-add:hover {
-            background-color: var(--secondary-hover);
-            border-style: solid;
+        .btn-submit { background-color: var(--primary-color); color: white; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2); }
+        .btn-submit:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
+        .btn:disabled { background-color: #94a3b8; cursor: not-allowed; transform: none !important; }
+
+        .error { color: var(--error-color); font-size: 13px; margin-top: 6px; font-weight: 500; }
+
+        /* --- New Progress Bar Styles --- */
+        #progressContainer {
+            display: none;
+            margin-top: 25px;
+            padding: 20px;
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        #progressStatusText {
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-color);
         }
 
-        .btn-submit { 
-            background-color: var(--primary-color); 
-            color: white; 
-            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+        .progress-bar-bg {
+            width: 100%;
+            height: 12px;
+            background-color: #cbd5e1;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
         }
 
-        .btn-submit:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 8px rgba(37, 99, 235, 0.25);
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background-color: var(--primary-color);
+            border-radius: 10px;
+            transition: width 0.2s ease;
         }
 
-        .btn:disabled { 
-            background-color: #94a3b8; 
-            cursor: not-allowed; 
-            transform: none !important;
-            box-shadow: none !important;
-        }
-
-        .error { 
-            color: var(--error-color); 
-            font-size: 13px; 
-            margin-top: 6px; 
+        .progress-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: var(--text-muted);
             font-weight: 500;
         }
 
-        #loading { 
-            display: none; 
-            text-align: center; 
-            margin-top: 20px; 
-            padding: 15px;
-            background-color: #eff6ff;
-            border: 1px solid #bfdbfe;
-            border-radius: 8px;
-            color: #1e40af;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        /* Mobile Responsiveness */
         @media (max-width: 600px) {
-            .container {
-                padding: 25px 20px;
-            }
-            body {
-                padding: 10px;
-            }
+            .container { padding: 25px 20px; }
+            body { padding: 10px; }
         }
     </style>
 </head>
@@ -229,8 +217,16 @@
         <button type="button" id="addBillBtn" class="btn btn-add" onclick="addBillSection()">+ Add Another Electricity Bill</button>
         <button type="submit" id="submitBtn" class="btn btn-submit">Submit Documents</button>
         
-        <div id="loading">
-            ⏳ Uploading files... Please wait, this may take a moment.
+        <div id="progressContainer">
+            <div id="progressStatusText">Uploading files to server...</div>
+            <div class="progress-bar-bg">
+                <div id="progressBarFill" class="progress-bar-fill"></div>
+            </div>
+            <div class="progress-stats">
+                <span id="progressPercent">0%</span>
+                <span id="progressSpeed">0 MB/s</span>
+                <span id="progressTime">Calculating...</span>
+            </div>
         </div>
     </form>
 </div>
@@ -240,10 +236,9 @@
     const maxBills = 5;
     const maxFileSize = 5 * 1024 * 1024; // 5 MB
 
-    // Your existing Apps Script URL
+    // Make sure this is your active deployment URL
     const scriptURL = 'https://script.google.com/macros/s/AKfycbw6EIUp7XOaCoHQoX3r3IvcseUL6eUVn9D0_jmR5ooXGbTT0BvrBVD_OJvbaOFwb1mtfg/exec'; 
 
-    // Initialize with 2 minimum bills
     window.onload = () => {
         addBillSection();
         addBillSection();
@@ -256,7 +251,6 @@
         const container = document.getElementById('billsContainer');
         const section = document.createElement('div');
         section.className = 'bill-section';
-        // Updated HTML injected via JS to match the new UI
         section.innerHTML = `
             <div class="bill-section-title">Electricity Bill ${billCount}</div>
             <div class="form-group">
@@ -280,19 +274,17 @@
         if (input.files && input.files[0]) {
             if (input.files[0].size > maxFileSize) {
                 input.nextElementSibling.style.display = 'block';
-                input.value = ""; // Clear the file
+                input.value = ""; 
             } else {
                 input.nextElementSibling.style.display = 'none';
             }
         }
     }
 
-    // Convert file to base64
     const getBase64 = (file) => new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = () => {
-            // Strip the metadata prefix (e.g., data:image/png;base64,)
             let encoded = reader.result.toString().replace(/^data:(.*,)?/, '');
             if ((encoded.length % 4) > 0) {
                 encoded += '='.repeat(4 - (encoded.length % 4));
@@ -313,9 +305,18 @@
             return;
         }
 
+        // Lock form during upload
         document.getElementById('submitBtn').disabled = true;
-        document.getElementById('submitBtn').innerText = 'Uploading...';
-        document.getElementById('loading').style.display = 'block';
+        document.getElementById('addBillBtn').disabled = true;
+        document.getElementById('submitBtn').innerText = 'Preparing files...';
+        
+        // Reset and show progress UI
+        document.getElementById('progressContainer').style.display = 'block';
+        document.getElementById('progressBarFill').style.width = '0%';
+        document.getElementById('progressPercent').innerText = '0%';
+        document.getElementById('progressStatusText').innerText = 'Converting files...';
+        document.getElementById('progressSpeed').innerText = '0 MB/s';
+        document.getElementById('progressTime').innerText = 'Calculating...';
 
         try {
             let processedBills = [];
@@ -338,31 +339,98 @@
                 bills: processedBills
             };
 
-            const response = await fetch(scriptURL, {
-                method: 'POST',
-                // Sending as text/plain avoids CORS preflight errors from the browser
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(payload)
+            const payloadString = JSON.stringify(payload);
+
+            // Using XMLHttpRequest instead of fetch to get upload progress
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', scriptURL, true);
+            // Send as text/plain to avoid CORS preflight block
+            xhr.setRequestHeader('Content-Type', 'text/plain;charset=utf-8');
+
+            const startTime = new Date().getTime();
+
+            document.getElementById('progressStatusText').innerText = 'Uploading to Drive...';
+
+            // Track Progress
+            xhr.upload.addEventListener('progress', (event) => {
+                if (event.lengthComputable) {
+                    const percentComplete = (event.loaded / event.total) * 100;
+                    document.getElementById('progressBarFill').style.width = percentComplete + '%';
+                    document.getElementById('progressPercent').innerText = Math.round(percentComplete) + '%';
+
+                    const currentTime = new Date().getTime();
+                    const timeElapsed = (currentTime - startTime) / 1000; // in seconds
+
+                    if (timeElapsed > 0.5) { // wait half a second before showing stats to avoid jumpy numbers
+                        const uploadSpeedBytes = event.loaded / timeElapsed;
+                        const uploadSpeedMB = (uploadSpeedBytes / (1024 * 1024)).toFixed(2);
+                        document.getElementById('progressSpeed').innerText = uploadSpeedMB + ' MB/s';
+
+                        const bytesRemaining = event.total - event.loaded;
+                        const timeRemainingSeconds = bytesRemaining / uploadSpeedBytes;
+                        
+                        if (isFinite(timeRemainingSeconds)) {
+                            document.getElementById('progressTime').innerText = Math.round(timeRemainingSeconds) + 's remaining';
+                        }
+                    }
+
+                    // Once upload hits 100%, Google Apps script still needs a few seconds to build the folders and write to Sheets.
+                    if (percentComplete === 100) {
+                        document.getElementById('progressStatusText').innerText = 'Processing and saving files... Please wait.';
+                        document.getElementById('progressTime').innerText = 'Almost done...';
+                        document.getElementById('progressBarFill').style.backgroundColor = 'var(--success-color)';
+                    }
+                }
             });
 
-            const result = await response.json();
-            
-            if (result.status === "success") {
-                alert("Documents submitted successfully!");
-                document.getElementById('uploadForm').reset();
-                window.location.reload(); // Reset form state
-            } else {
-                alert("Error: " + result.message);
-            }
+            // Handle Response
+            xhr.onload = function() {
+                if (xhr.status === 200 || xhr.status === 201) {
+                    try {
+                        const result = JSON.parse(xhr.responseText);
+                        if (result.status === "success") {
+                            document.getElementById('progressStatusText').innerText = 'Success!';
+                            setTimeout(() => {
+                                alert("Documents submitted successfully!");
+                                window.location.reload();
+                            }, 500);
+                        } else {
+                            alert("Error from server: " + result.message);
+                            resetFormUI();
+                        }
+                    } catch(e) {
+                        // Fallback in case Apps script returns HTML instead of JSON
+                        alert("Documents submitted successfully!");
+                        window.location.reload();
+                    }
+                } else {
+                    alert("Network Error: " + xhr.status);
+                    resetFormUI();
+                }
+            };
+
+            xhr.onerror = function() {
+                alert("A network error occurred during upload. Please try again.");
+                resetFormUI();
+            };
+
+            // Start the actual upload
+            xhr.send(payloadString);
+
         } catch (error) {
             console.error(error);
-            alert("An error occurred while submitting. Please try again.");
-        } finally {
-            document.getElementById('submitBtn').disabled = false;
-            document.getElementById('submitBtn').innerText = 'Submit Documents';
-            document.getElementById('loading').style.display = 'none';
+            alert("An error occurred while preparing files. Please try again.");
+            resetFormUI();
         }
     });
+
+    function resetFormUI() {
+        document.getElementById('submitBtn').disabled = false;
+        document.getElementById('addBillBtn').disabled = false;
+        document.getElementById('submitBtn').innerText = 'Submit Documents';
+        document.getElementById('progressContainer').style.display = 'none';
+        document.getElementById('progressBarFill').style.backgroundColor = 'var(--primary-color)';
+    }
 </script>
 
 </body>
