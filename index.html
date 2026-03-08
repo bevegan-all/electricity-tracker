@@ -143,7 +143,7 @@
 
         .error { color: var(--error-color); font-size: 13px; margin-top: 6px; font-weight: 500; }
 
-        /* --- New Progress Bar Styles --- */
+        /* Progress Bar Styles */
         #progressContainer {
             display: none;
             margin-top: 25px;
@@ -174,7 +174,7 @@
             width: 0%;
             background-color: var(--primary-color);
             border-radius: 10px;
-            transition: width 0.2s ease;
+            transition: width 0.5s ease;
         }
 
         .progress-stats {
@@ -194,7 +194,7 @@
 <body>
 
 <div class="container">
-    <h2>Electricity Bill Collection</h2>
+    <h2>OKElectricity Bill Collection</h2>
     <div class="subtitle">Please submit 2 to 5 recent electricity bills</div>
     
     <form id="uploadForm">
@@ -218,13 +218,12 @@
         <button type="submit" id="submitBtn" class="btn btn-submit">Submit Documents</button>
         
         <div id="progressContainer">
-            <div id="progressStatusText">Uploading files to server...</div>
+            <div id="progressStatusText">Preparing files...</div>
             <div class="progress-bar-bg">
                 <div id="progressBarFill" class="progress-bar-fill"></div>
             </div>
             <div class="progress-stats">
                 <span id="progressPercent">0%</span>
-                <span id="progressSpeed">0 MB/s</span>
                 <span id="progressTime">Calculating...</span>
             </div>
         </div>
@@ -236,7 +235,7 @@
     const maxBills = 5;
     const maxFileSize = 5 * 1024 * 1024; // 5 MB
 
-    // Make sure this is your active deployment URL
+    // Your active deployment URL
     const scriptURL = 'https://script.google.com/macros/s/AKfycbw6EIUp7XOaCoHQoX3r3IvcseUL6eUVn9D0_jmR5ooXGbTT0BvrBVD_OJvbaOFwb1mtfg/exec'; 
 
     window.onload = () => {
@@ -298,9 +297,9 @@
         e.preventDefault();
         
         const dates = document.querySelectorAll('.bill-date');
-        const files = document.querySelectorAll('.bill-file');
+        const filesInputs = document.querySelectorAll('.bill-file');
         
-        if (files.length < 2) {
+        if (filesInputs.length < 2) {
             alert("Please upload at least 2 electricity bills.");
             return;
         }
@@ -308,20 +307,22 @@
         // Lock form during upload
         document.getElementById('submitBtn').disabled = true;
         document.getElementById('addBillBtn').disabled = true;
-        document.getElementById('submitBtn').innerText = 'Preparing files...';
+        document.getElementById('submitBtn').innerText = 'Uploading...';
         
         // Reset and show progress UI
         document.getElementById('progressContainer').style.display = 'block';
         document.getElementById('progressBarFill').style.width = '0%';
         document.getElementById('progressPercent').innerText = '0%';
-        document.getElementById('progressStatusText').innerText = 'Converting files...';
-        document.getElementById('progressSpeed').innerText = '0 MB/s';
-        document.getElementById('progressTime').innerText = 'Calculating...';
+        document.getElementById('progressStatusText').innerText = 'Uploading to Drive...';
+        document.getElementById('progressBarFill').style.backgroundColor = 'var(--primary-color)';
 
         try {
             let processedBills = [];
-            for (let i = 0; i < files.length; i++) {
-                const fileObj = files[i].files[0];
+            let totalBytes = 0;
+
+            for (let i = 0; i < filesInputs.length; i++) {
+                const fileObj = filesInputs[i].files[0];
+                totalBytes += fileObj.size; // Calculate total size
                 const base64Data = await getBase64(fileObj);
                 
                 processedBills.push({
@@ -339,87 +340,60 @@
                 bills: processedBills
             };
 
-            const payloadString = JSON.stringify(payload);
-
-            // Using XMLHttpRequest instead of fetch to get upload progress
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', scriptURL, true);
-            // Send as text/plain to avoid CORS preflight block
-            xhr.setRequestHeader('Content-Type', 'text/plain;charset=utf-8');
-
-            const startTime = new Date().getTime();
-
-            document.getElementById('progressStatusText').innerText = 'Uploading to Drive...';
-
-            // Track Progress
-            xhr.upload.addEventListener('progress', (event) => {
-                if (event.lengthComputable) {
-                    const percentComplete = (event.loaded / event.total) * 100;
-                    document.getElementById('progressBarFill').style.width = percentComplete + '%';
-                    document.getElementById('progressPercent').innerText = Math.round(percentComplete) + '%';
-
-                    const currentTime = new Date().getTime();
-                    const timeElapsed = (currentTime - startTime) / 1000; // in seconds
-
-                    if (timeElapsed > 0.5) { // wait half a second before showing stats to avoid jumpy numbers
-                        const uploadSpeedBytes = event.loaded / timeElapsed;
-                        const uploadSpeedMB = (uploadSpeedBytes / (1024 * 1024)).toFixed(2);
-                        document.getElementById('progressSpeed').innerText = uploadSpeedMB + ' MB/s';
-
-                        const bytesRemaining = event.total - event.loaded;
-                        const timeRemainingSeconds = bytesRemaining / uploadSpeedBytes;
-                        
-                        if (isFinite(timeRemainingSeconds)) {
-                            document.getElementById('progressTime').innerText = Math.round(timeRemainingSeconds) + 's remaining';
-                        }
-                    }
-
-                    // Once upload hits 100%, Google Apps script still needs a few seconds to build the folders and write to Sheets.
-                    if (percentComplete === 100) {
-                        document.getElementById('progressStatusText').innerText = 'Processing and saving files... Please wait.';
-                        document.getElementById('progressTime').innerText = 'Almost done...';
-                        document.getElementById('progressBarFill').style.backgroundColor = 'var(--success-color)';
-                    }
+            // Calculate estimated time based on file size (assuming ~300KB/s on a decent connection)
+            let estimatedSeconds = Math.max((totalBytes / 300000), 4); 
+            let currentProgress = 0;
+            
+            // Start Simulated Progress Bar
+            const progressInterval = setInterval(() => {
+                // Advance the bar gradually based on estimated time
+                currentProgress += (100 / estimatedSeconds) * 0.5; 
+                
+                if (currentProgress > 95) {
+                    currentProgress = 95; // Hold at 95% until server responds
+                    document.getElementById('progressStatusText').innerText = 'Processing files on server...';
                 }
+                
+                document.getElementById('progressBarFill').style.width = currentProgress + '%';
+                document.getElementById('progressPercent').innerText = Math.round(currentProgress) + '%';
+                
+                let timeRemaining = Math.max(Math.round(estimatedSeconds - (currentProgress/100 * estimatedSeconds)), 1);
+                document.getElementById('progressTime').innerText = `Estimated ~${timeRemaining}s remaining`;
+
+            }, 500); // update every half second
+
+            // Send using fetch (safe from CORS preflight issues)
+            const response = await fetch(scriptURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
             });
 
-            // Handle Response
-            xhr.onload = function() {
-                if (xhr.status === 200 || xhr.status === 201) {
-                    try {
-                        const result = JSON.parse(xhr.responseText);
-                        if (result.status === "success") {
-                            document.getElementById('progressStatusText').innerText = 'Success!';
-                            setTimeout(() => {
-                                alert("Documents submitted successfully!");
-                                window.location.reload();
-                            }, 500);
-                        } else {
-                            alert("Error from server: " + result.message);
-                            resetFormUI();
-                        }
-                    } catch(e) {
-                        // Fallback in case Apps script returns HTML instead of JSON
-                        alert("Documents submitted successfully!");
-                        window.location.reload();
-                    }
-                } else {
-                    alert("Network Error: " + xhr.status);
-                    resetFormUI();
-                }
-            };
+            const result = await response.json();
+            
+            // Clear the simulated progress and push to 100%
+            clearInterval(progressInterval);
 
-            xhr.onerror = function() {
-                alert("A network error occurred during upload. Please try again.");
+            if (result.status === "success") {
+                document.getElementById('progressBarFill').style.width = '100%';
+                document.getElementById('progressPercent').innerText = '100%';
+                document.getElementById('progressTime').innerText = 'Done!';
+                document.getElementById('progressStatusText').innerText = 'Success!';
+                document.getElementById('progressBarFill').style.backgroundColor = 'var(--success-color)';
+                
+                setTimeout(() => {
+                    alert("Documents submitted successfully!");
+                    document.getElementById('uploadForm').reset();
+                    window.location.reload(); 
+                }, 600);
+            } else {
+                alert("Error from server: " + result.message);
                 resetFormUI();
-            };
-
-            // Start the actual upload
-            xhr.send(payloadString);
+            }
 
         } catch (error) {
             console.error(error);
-            alert("An error occurred while preparing files. Please try again.");
+            alert("An error occurred during upload. Please check your connection and try again.");
             resetFormUI();
         }
     });
@@ -429,7 +403,6 @@
         document.getElementById('addBillBtn').disabled = false;
         document.getElementById('submitBtn').innerText = 'Submit Documents';
         document.getElementById('progressContainer').style.display = 'none';
-        document.getElementById('progressBarFill').style.backgroundColor = 'var(--primary-color)';
     }
 </script>
 
