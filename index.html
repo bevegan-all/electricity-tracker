@@ -5,37 +5,222 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Electricity Bill Submission</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f7f6; padding: 20px; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #333; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; }
-        input[type="text"], input[type="date"], input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        .bill-section { background: #f9f9f9; padding: 15px; border: 1px dashed #ccc; margin-bottom: 15px; border-radius: 4px; }
-        .btn { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 10px;}
-        .btn-add { background-color: #28a745; color: white; width: 100%; }
-        .btn-submit { background-color: #007bff; color: white; width: 100%; font-weight: bold; margin-top: 20px;}
-        .btn:disabled { background-color: #ccc; cursor: not-allowed; }
-        .error { color: red; font-size: 12px; margin-top: 5px; }
-        #loading { display: none; text-align: center; margin-top: 15px; font-weight: bold; color: #007bff; }
+        /* Modern CSS Reset and Base Styles */
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #f1f5f9;
+            --secondary-hover: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --bg-color: #f8fafc;
+            --error-color: #ef4444;
+        }
+
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px; 
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container { 
+            width: 100%;
+            max-width: 650px; 
+            background: white; 
+            padding: 40px; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+            box-sizing: border-box;
+        }
+
+        h2 { 
+            text-align: center; 
+            color: var(--text-main); 
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group { 
+            margin-bottom: 20px; 
+        }
+
+        label { 
+            display: block; 
+            font-weight: 600; 
+            margin-bottom: 8px; 
+            font-size: 14px;
+            color: var(--text-main);
+        }
+
+        input[type="text"], 
+        input[type="date"], 
+        input[type="file"] { 
+            width: 100%; 
+            padding: 12px 15px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            background-color: #fff;
+        }
+
+        input[type="text"]:focus, 
+        input[type="date"]:focus, 
+        input[type="file"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        /* Styling the file input specifically */
+        input[type="file"] {
+            padding: 10px;
+            color: var(--text-muted);
+        }
+        input[type="file"]::file-selector-button {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: var(--secondary-color);
+            color: var(--text-main);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-right: 15px;
+        }
+        input[type="file"]::file-selector-button:hover {
+            background-color: var(--secondary-hover);
+        }
+
+        .bill-section { 
+            background: #ffffff; 
+            padding: 20px; 
+            border: 1px solid var(--border-color); 
+            margin-bottom: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            position: relative;
+        }
+
+        .bill-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--secondary-hover);
+        }
+
+        .btn { 
+            padding: 14px 20px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: 600;
+            width: 100%; 
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        .btn-add { 
+            background-color: var(--secondary-color); 
+            color: var(--text-main); 
+            border: 1px dashed #94a3b8;
+            margin-bottom: 20px;
+        }
+
+        .btn-add:hover {
+            background-color: var(--secondary-hover);
+            border-style: solid;
+        }
+
+        .btn-submit { 
+            background-color: var(--primary-color); 
+            color: white; 
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-submit:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 8px rgba(37, 99, 235, 0.25);
+        }
+
+        .btn:disabled { 
+            background-color: #94a3b8; 
+            cursor: not-allowed; 
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .error { 
+            color: var(--error-color); 
+            font-size: 13px; 
+            margin-top: 6px; 
+            font-weight: 500;
+        }
+
+        #loading { 
+            display: none; 
+            text-align: center; 
+            margin-top: 20px; 
+            padding: 15px;
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            color: #1e40af;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px 20px;
+            }
+            body {
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h2>Electricity Bill Collection</h2>
+    <div class="subtitle">Please submit 2 to 5 recent electricity bills</div>
+    
     <form id="uploadForm">
         <div class="form-group">
-            <label>Name (e.g. Omkar Bhujbal)</label>
-            <input type="text" id="name" required>
+            <label>Full Name</label>
+            <input type="text" id="name" placeholder="e.g. Omkar Bhujbal" required>
         </div>
         <div class="form-group">
-            <label>Class (e.g. SY BCA E3)</label>
-            <input type="text" id="studentClass" required>
+            <label>Class</label>
+            <input type="text" id="studentClass" placeholder="e.g. SY BCA E3" required>
         </div>
         <div class="form-group">
-            <label>Roll No (e.g. SE3305)</label>
-            <input type="text" id="rollNo" required>
+            <label>Roll No</label>
+            <input type="text" id="rollNo" placeholder="e.g. SE3305" required>
         </div>
 
         <div id="billsContainer">
@@ -44,7 +229,9 @@
         <button type="button" id="addBillBtn" class="btn btn-add" onclick="addBillSection()">+ Add Another Electricity Bill</button>
         <button type="submit" id="submitBtn" class="btn btn-submit">Submit Documents</button>
         
-        <div id="loading">Uploading files... Please wait, this may take a moment.</div>
+        <div id="loading">
+            ⏳ Uploading files... Please wait, this may take a moment.
+        </div>
     </form>
 </div>
 
@@ -53,7 +240,7 @@
     const maxBills = 5;
     const maxFileSize = 5 * 1024 * 1024; // 5 MB
 
-    // REPLACE THIS WITH YOUR APPS SCRIPT WEB APP URL
+    // Your existing Apps Script URL
     const scriptURL = 'https://script.google.com/macros/s/AKfycbw6EIUp7XOaCoHQoX3r3IvcseUL6eUVn9D0_jmR5ooXGbTT0BvrBVD_OJvbaOFwb1mtfg/exec'; 
 
     // Initialize with 2 minimum bills
@@ -69,16 +256,17 @@
         const container = document.getElementById('billsContainer');
         const section = document.createElement('div');
         section.className = 'bill-section';
+        // Updated HTML injected via JS to match the new UI
         section.innerHTML = `
-            <label>Electricity Bill ${billCount}</label>
+            <div class="bill-section-title">Electricity Bill ${billCount}</div>
             <div class="form-group">
-                <label style="font-size: 14px; font-weight: normal;">Bill Date</label>
+                <label style="font-weight: 500;">Bill Date</label>
                 <input type="date" class="bill-date" required>
             </div>
-            <div class="form-group">
-                <label style="font-size: 14px; font-weight: normal;">Upload Document (Image/PDF, Max 5MB)</label>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label style="font-weight: 500;">Upload Document (Image/PDF, Max 5MB)</label>
                 <input type="file" class="bill-file" accept="image/*,application/pdf" required onchange="checkFileSize(this)">
-                <div class="error" style="display:none;">File exceeds 5MB limit!</div>
+                <div class="error" style="display:none;">⚠️ File exceeds 5MB limit!</div>
             </div>
         `;
         container.appendChild(section);
@@ -126,6 +314,7 @@
         }
 
         document.getElementById('submitBtn').disabled = true;
+        document.getElementById('submitBtn').innerText = 'Uploading...';
         document.getElementById('loading').style.display = 'block';
 
         try {
@@ -170,6 +359,7 @@
             alert("An error occurred while submitting. Please try again.");
         } finally {
             document.getElementById('submitBtn').disabled = false;
+            document.getElementById('submitBtn').innerText = 'Submit Documents';
             document.getElementById('loading').style.display = 'none';
         }
     });
