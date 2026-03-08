@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electricity Bill Submission</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f7f6; padding: 20px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input[type="text"], input[type="date"], input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .bill-section { background: #f9f9f9; padding: 15px; border: 1px dashed #ccc; margin-bottom: 15px; border-radius: 4px; }
+        .btn { padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 10px;}
+        .btn-add { background-color: #28a745; color: white; width: 100%; }
+        .btn-submit { background-color: #007bff; color: white; width: 100%; font-weight: bold; margin-top: 20px;}
+        .btn:disabled { background-color: #ccc; cursor: not-allowed; }
+        .error { color: red; font-size: 12px; margin-top: 5px; }
+        #loading { display: none; text-align: center; margin-top: 15px; font-weight: bold; color: #007bff; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Electricity Bill Collection</h2>
+    <form id="uploadForm">
+        <div class="form-group">
+            <label>Name (e.g. Omkar Bhujbal)</label>
+            <input type="text" id="name" required>
+        </div>
+        <div class="form-group">
+            <label>Class (e.g. SY BCA E3)</label>
+            <input type="text" id="studentClass" required>
+        </div>
+        <div class="form-group">
+            <label>Roll No (e.g. SE3305)</label>
+            <input type="text" id="rollNo" required>
+        </div>
+
+        <div id="billsContainer">
+            </div>
+
+        <button type="button" id="addBillBtn" class="btn btn-add" onclick="addBillSection()">+ Add Another Electricity Bill</button>
+        <button type="submit" id="submitBtn" class="btn btn-submit">Submit Documents</button>
+        
+        <div id="loading">Uploading files... Please wait, this may take a moment.</div>
+    </form>
+</div>
+
+<script>
+    let billCount = 0;
+    const maxBills = 5;
+    const maxFileSize = 5 * 1024 * 1024; // 5 MB
+
+    // REPLACE THIS WITH YOUR APPS SCRIPT WEB APP URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbw6EIUp7XOaCoHQoX3r3IvcseUL6eUVn9D0_jmR5ooXGbTT0BvrBVD_OJvbaOFwb1mtfg/exec'; 
+
+    // Initialize with 2 minimum bills
+    window.onload = () => {
+        addBillSection();
+        addBillSection();
+    };
+
+    function addBillSection() {
+        if (billCount >= maxBills) return;
+        billCount++;
+
+        const container = document.getElementById('billsContainer');
+        const section = document.createElement('div');
+        section.className = 'bill-section';
+        section.innerHTML = `
+            <label>Electricity Bill ${billCount}</label>
+            <div class="form-group">
+                <label style="font-size: 14px; font-weight: normal;">Bill Date</label>
+                <input type="date" class="bill-date" required>
+            </div>
+            <div class="form-group">
+                <label style="font-size: 14px; font-weight: normal;">Upload Document (Image/PDF, Max 5MB)</label>
+                <input type="file" class="bill-file" accept="image/*,application/pdf" required onchange="checkFileSize(this)">
+                <div class="error" style="display:none;">File exceeds 5MB limit!</div>
+            </div>
+        `;
+        container.appendChild(section);
+
+        if (billCount === maxBills) {
+            document.getElementById('addBillBtn').style.display = 'none';
+        }
+    }
+
+    function checkFileSize(input) {
+        if (input.files && input.files[0]) {
+            if (input.files[0].size > maxFileSize) {
+                input.nextElementSibling.style.display = 'block';
+                input.value = ""; // Clear the file
+            } else {
+                input.nextElementSibling.style.display = 'none';
+            }
+        }
+    }
+
+    // Convert file to base64
+    const getBase64 = (file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+            // Strip the metadata prefix (e.g., data:image/png;base64,)
+            let encoded = reader.result.toString().replace(/^data:(.*,)?/, '');
+            if ((encoded.length % 4) > 0) {
+                encoded += '='.repeat(4 - (encoded.length % 4));
+            }
+            resolve(encoded);
+        };
+        reader.onerror = error => reject(error);
+    });
+
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const dates = document.querySelectorAll('.bill-date');
+        const files = document.querySelectorAll('.bill-file');
+        
+        if (files.length < 2) {
+            alert("Please upload at least 2 electricity bills.");
+            return;
+        }
+
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('loading').style.display = 'block';
+
+        try {
+            let processedBills = [];
+            for (let i = 0; i < files.length; i++) {
+                const fileObj = files[i].files[0];
+                const base64Data = await getBase64(fileObj);
+                
+                processedBills.push({
+                    date: dates[i].value,
+                    filename: fileObj.name,
+                    mimeType: fileObj.type,
+                    base64: base64Data
+                });
+            }
+
+            const payload = {
+                name: document.getElementById('name').value,
+                studentClass: document.getElementById('studentClass').value,
+                rollNo: document.getElementById('rollNo').value,
+                bills: processedBills
+            };
+
+            const response = await fetch(scriptURL, {
+                method: 'POST',
+                // Sending as text/plain avoids CORS preflight errors from the browser
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+            
+            if (result.status === "success") {
+                alert("Documents submitted successfully!");
+                document.getElementById('uploadForm').reset();
+                window.location.reload(); // Reset form state
+            } else {
+                alert("Error: " + result.message);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("An error occurred while submitting. Please try again.");
+        } finally {
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('loading').style.display = 'none';
+        }
+    });
+</script>
+
+</body>
+</html>
